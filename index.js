@@ -1,41 +1,38 @@
-const { google } = require('googleapis');
-const fs = require('fs');
-
-// Authenticate using the credentials file
-const auth = new google.auth.GoogleAuth({
-  keyFile: 'credentials.json',
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
-
-const sheets = google.sheets({ version: 'v4', auth });
-
-const { Client, GatewayIntentBits } = require('discord.js');
-require('dotenv').config();
+const fs = require("fs");
+const path = require("path");
+const { Client, Collection, GatewayIntentBits } = require("discord.js");
+require("dotenv").config();
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [GatewayIntentBits.Guilds],
 });
 
-client.once('ready', () => {
-  console.log(`Logged in as ${client.user.tag}`);
-});
+client.commands = new Collection();
 
-async function testSheetRead() {
-  const spreadsheetId = '1Lad6LgQVZQOuOARJRYR3R7l6uPwlROkdUWeuTbydiI0'; // from the Sheet URL
-  const range = 'Reminders!B5:C5'; // adjust to fit your sheet
+// Load all commands from /slashes
+const commandFiles = fs.readdirSync(path.join(__dirname, "slashes")).filter(file => file.endsWith(".js"));
 
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range,
-  });
-
-  console.log('Data from sheet:', response.data.values);
+for (const file of commandFiles) {
+  const command = require(`./slashes/${file}`);
+  client.commands.set(command.data.name, command);
 }
 
-client.once('ready', () => {
-  console.log(`Logged in as ${client.user.tag}`);
-  testSheetRead(); // <-- Call test function
+client.once("ready", () => {
+  console.log(`✅ Logged in as ${client.user.tag}`);
+});
+
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error("❌ Error executing command:", error);
+    await interaction.reply({ content: "Something went wrong.", ephemeral: true });
+  }
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
