@@ -6,7 +6,7 @@ const auth = new google.auth.GoogleAuth({
 });
 const sheets = google.sheets({ version: "v4", auth });
 
-async function sendDailyReminder(interaction) {
+async function sendDailyReminder(interaction, client) {
   const spreadsheetId = "1Lad6LgQVZQOuOARJRYR3R7l6uPwlROkdUWeuTbydiI0"; // Replace with your ID
   const range = "Reminders!C6:F";
   const channel = interaction.channel;

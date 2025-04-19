@@ -7,6 +7,6 @@ module.exports = {
     .setDescription("I’ll get the tasks for you~"),
   async execute(interaction) {
     await interaction.reply({ content: "📬 Checking your tasks...", ephemeral: true });
-    await sendDailyReminder(interaction);
+    await sendDailyReminder(interaction, interaction.client);
   }
 };
