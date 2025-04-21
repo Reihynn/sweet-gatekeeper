@@ -41,16 +41,16 @@ async function sendTask(interaction, client) {
     });
 
     
-    const taskList = sortedRows.map(([task, desc, date], i) => {
-      if (!date) return `**${i + 1}. ${task}**📅 No date\n-# - ${desc}`;
+    const taskList = sortedRows.map((row, i) => {
+      if (!row.date) return `**${i + 1}. ${row.task}**📅 No date\n-# - ${row.desc}`;
 
-      const parsedDate = new Date(date);
+      const parsedDate = new Date(row.date);
       if (isNaN(parsedDate)) {
-        return `**${i + 1}. ${task}**⚠️ Invalid date\n-# - ${desc}`;
+        return `**${i + 1}. ${row.task}**⚠️ Invalid date\n-# - ${row.desc}`;
       }
 
       const unix = Math.floor(parsedDate.getTime() / 1000) - 25200;
-      return `**${i + 1}. ${task}**📅 <t:${unix}:R> (<t:${unix}:F>)\n-# - ${desc}`;
+      return `**${i + 1}. ${row.task}**📅 <t:${unix}:R> (<t:${unix}:F>)\n-# - ${row.desc}`;
     }).join("\n");
 
     const buttons = sortedRows.map(({ originalIndex }, i) => ({
