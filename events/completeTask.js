@@ -58,10 +58,11 @@ module.exports = {
           },
         });
 
-        await interaction.reply({
-          content: `✅ Task ${displayNumber} marked as done!`,
-          ephemeral: true,
-        });
+        // Update the task list after marking as done
+        await sendTask(interaction, interaction.client);
+        
+        // Use deferred reply instead of a new reply
+        await interaction.deferUpdate();
       } catch (err) {
         console.error("Failed to mark task done:", err);
         await interaction.reply({
