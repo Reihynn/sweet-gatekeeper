@@ -10,6 +10,16 @@ const client = new Client({
 const interactionCreateHandler = require('./events/completeTask');
 client.on('interactionCreate', interactionCreateHandler.execute);
 
+const paginationHandler = require('./events/pagination');  // Adjust path if necessary
+
+client.on('interactionCreate', async (interaction) => {
+  if (interaction.isButton()) {
+    await paginationHandler(client, interaction);  // Handle pagination clicks
+  }
+
+  // Additional interaction handlers (like marking tasks) can go here
+});
+
 client.commands = new Collection();
 
 // Load all commands from /slashes

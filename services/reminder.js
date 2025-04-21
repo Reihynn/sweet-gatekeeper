@@ -6,11 +6,11 @@ const auth = new google.auth.GoogleAuth({
 });
 const sheets = google.sheets({ version: "v4", auth });
 
-async function sendTask(interaction, client) {
+async function sendTask(interaction, client, page = 0) {
   const spreadsheetId = process.env.SHEET_ID;
   const range = "Reminders!C6:E";
   const channel = interaction.channel;
-
+  
   try {
     const res = await sheets.spreadsheets.values.get({ spreadsheetId, range });
     const rows = res.data.values || [];
@@ -40,8 +40,49 @@ async function sendTask(interaction, client) {
       return dateA - dateB;
     });
 
+    const tasksPerPage = 5;  // You can adjust the number of tasks per page
+    const totalPages = Math.ceil(sortedRows.length / tasksPerPage); // Calculate total pages
     
-    const taskList = sortedRows.map((row, i) => {
+    const startIndex = page * tasksPerPage;
+    const endIndex = startIndex + tasksPerPage;
+    const limitedRows = sortedRows.slice(startIndex, endIndex);
+
+    const buttons = limitedRows.map((row, i) => ({
+      type: 2,
+      label: `${i + 1}`,
+      style: 1,
+      custom_id: `markDone-${row.originalIndex}-${i + 1}`, // Use originalIndex to track tasks
+    }));
+
+    // Create action rows for buttons (grouped in rows of 5)
+    const buttonRows = [];
+    for (let i = 0; i < buttons.length; i += 5) {
+      buttonRows.push({
+        type: 1, // Action Row
+        components: buttons.slice(i, i + 5),
+      });
+    }
+
+    // Pagination buttons (Prev and Next)
+    const paginationButtons = [
+      {
+        type: 2,
+        label: "Prev",
+        style: 1,
+        custom_id: "prevPage",
+        disabled: page === 0,  // Disable "Prev" button on the first page
+      },
+      {
+        type: 2,
+        label: "Next",
+        style: 1,
+        custom_id: "nextPage",
+        disabled: startIndex + tasksPerPage >= rows.length,  // Disable "Next" button if last page
+      },
+    ];
+
+    
+    const taskList = limitedRows.map((row, i) => {
       if (!row.date) return `**${i + 1}. ${row.task}**📅 No date\n-# - ${row.desc}`;
 
       const parsedDate = new Date(row.date);
@@ -53,28 +94,12 @@ async function sendTask(interaction, client) {
       return `**${i + 1}. ${row.task}**📅 <t:${unix}:R> (<t:${unix}:F>)\n-# - ${row.desc}`;
     }).join("\n");
 
-    const buttons = sortedRows.map((row, i) => ({
-      type: 2,
-      label: `${i + 1}`,
-      style: 1,
-      custom_id: `markDone-${row.originalIndex}-${i + 1}`,
-    }));
-
-
-    const buttonRows = [];
-    for (let i = 0; i < buttons.length; i += 5) {
-      buttonRows.push({
-        type: 1, // Action Row
-        components: buttons.slice(i, i + 5),
-      });
-    }
-    
     const embed = new EmbedBuilder()
       .setColor(0x7289da)
       .setTitle(`🗒️ All Tasks for ${interaction.user.tag} ^^`)
       .setDescription(taskList)
       .setImage("https://reirei.s-ul.eu/1eUOSOOF")
-      .setFooter({ text: "Enjoy your day~", iconURL: client.user.displayAvatarURL() });
+      .setFooter({ text: `Page ${page + 1} / ${totalPages} | Press the button to mark it as complete!`, iconURL: client.user.displayAvatarURL() });
 
     await channel.send({
       embeds: [embed],
