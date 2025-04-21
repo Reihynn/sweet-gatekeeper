@@ -33,6 +33,9 @@ module.exports = {
       const range = "Reminders!F6:F"; // Column F (marked as done)
 
       try {
+        // First defer the update to acknowledge the button press
+        await interaction.deferUpdate();
+
         // Get total rows to validate index
         const response = await sheets.spreadsheets.values.get({
           spreadsheetId,
@@ -42,7 +45,7 @@ module.exports = {
         const rows = response.data.values || [];
         
         if (index < 0 || index >= rows.length) {
-          await interaction.reply({
+          await interaction.followUp({
             content: "⚠️ Invalid task number.",
             ephemeral: true,
           });
@@ -58,15 +61,12 @@ module.exports = {
             values: [["TRUE"]],
           },
         });
-
-        // First defer the update
-        await interaction.deferUpdate();
         
-        // Then update the task list
+        // Update the task list
         await sendTask(interaction, interaction.client);
       } catch (err) {
         console.error("Failed to mark task done:", err);
-        await interaction.reply({
+        await interaction.followUp({
           content: "⚠️ Couldn't update task status.",
           ephemeral: true,
         });
