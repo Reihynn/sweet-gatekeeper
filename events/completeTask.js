@@ -1,12 +1,10 @@
+
 const { google } = require("googleapis");
 
 const auth = new google.auth.GoogleAuth({
   keyFile: "credentials.json",
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
-
-const parts = interaction.customId.split("-");
-const displayNumber = parts[2];
 
 const sheets = google.sheets({ version: "v4", auth });
 
@@ -18,7 +16,9 @@ module.exports = {
     const customId = interaction.customId;
 
     if (customId.startsWith("markDone-")) {
-      const index = parseInt(customId.split("-")[1]);
+      const parts = interaction.customId.split("-");
+      const index = parseInt(parts[1]);
+      const displayNumber = parts[2];
 
       const spreadsheetId = process.env.SHEET_ID;
       const range = "Reminders!F6:F"; // Column F (marked as done)
