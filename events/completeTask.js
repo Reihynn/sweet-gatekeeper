@@ -32,10 +32,19 @@ module.exports = {
       const range = "Reminders!F6:F"; // Column F (marked as done)
 
       try {
+        // Validate the index is within bounds (0-based index)
+        if (index < 0) {
+          await interaction.reply({
+            content: "⚠️ Invalid task number.",
+            ephemeral: true,
+          });
+          return;
+        }
+
         // Mark the row as done (TRUE in column F)
         await sheets.spreadsheets.values.update({
           spreadsheetId,
-          range: `Reminders!F${index + 6}`, // +6 because sheet starts at C6
+          range: `Reminders!F${6 + index}`, // +6 because sheet starts at row 6
           valueInputOption: "USER_ENTERED",
           resource: {
             values: [["TRUE"]],
