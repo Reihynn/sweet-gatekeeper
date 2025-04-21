@@ -6,8 +6,8 @@ const auth = new google.auth.GoogleAuth({
 });
 const sheets = google.sheets({ version: "v4", auth });
 
-async function sendDailyReminder(interaction, client) {
-  const spreadsheetId = "1Lad6LgQVZQOuOARJRYR3R7l6uPwlROkdUWeuTbydiI0"; // Replace with your ID
+async function sendTask(interaction, client) {
+  const spreadsheetId = "1Lad6LgQVZQOuOARJRYR3R7l6uPwlROkdUWeuTbydiI0";
   const range = "Reminders!C6:F";
   const channel = interaction.channel;
 
@@ -37,7 +37,7 @@ async function sendDailyReminder(interaction, client) {
       .setTitle(`🗒️ All Tasks for ${interaction.user.tag} ^^`)
       .setDescription(taskList)
       .setImage("https://reirei.s-ul.eu/1eUOSOOF")
-      .setFooter({ text: "Synced from Google Sheets", iconURL: client.user.displayAvatarURL() });
+      .setFooter({ text: "Enjoy your day~", iconURL: client.user.displayAvatarURL() });
 
     await channel.send({ embeds: [embed] });
   } catch (err) {
@@ -46,6 +46,18 @@ async function sendDailyReminder(interaction, client) {
   }
 }
 
+async function addTask(task, description, date) {
+  const values = [[task, description, date]];
+  const resource = { values };
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: "1Lad6LgQVZQOuOARJRYR3R7l6uPwlROkdUWeuTbydiI0",
+    range: "Reminders!C6:F",
+    valueInputOption: 'USER_ENTERED',
+    resource,
+  });
+}
+
 module.exports = {
-  sendDailyReminder,
+  sendTask, addTask
 };
