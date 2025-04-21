@@ -32,8 +32,15 @@ module.exports = {
       const range = "Reminders!F6:F"; // Column F (marked as done)
 
       try {
-        // Validate the index is within bounds (0-based index)
-        if (index < 0) {
+        // Get total rows to validate index
+        const response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "Reminders!C6:E"
+        });
+        
+        const rows = response.data.values || [];
+        
+        if (index < 0 || index >= rows.length) {
           await interaction.reply({
             content: "⚠️ Invalid task number.",
             ephemeral: true,
