@@ -1,29 +1,28 @@
-const { sendTask } = require('../services/reminder'); // Adjust the path as needed
+
+const { sendTask } = require('../services/reminder');
 
 module.exports = async (client, interaction) => {
   if (!interaction.isButton()) return;
 
-  let page = 0;  // This can be dynamically handled with a state tracking mechanism like a Map or user data
+  try {
+    // Defer the button interaction immediately
+    await interaction.deferUpdate();
+    
+    let page = 0;
 
-  // Handle "Prev" button click
-  if (interaction.customId === "prevPage") {
-    page = Math.max(page - 1, 0); // Prevent going to negative pages
-    await sendTask(interaction, client, page); // Send the updated tasks for the previous page
-    await interaction.deferUpdate(); // Acknowledge the interaction without replying
-  }
-
-  // Handle "Next" button click
-  else if (interaction.customId === "nextPage") {
-    page += 1; // Increment the page number for the next set of tasks
-    await sendTask(interaction, client, page); // Send the updated tasks for the next page
-    await interaction.deferUpdate(); // Acknowledge the interaction without replying
-  }
-
-  // Handle task marking click (if applicable)
-  else if (interaction.customId.startsWith("markDone-")) {
-    const [_, originalIndex] = interaction.customId.split("-");
-    // Here you can process marking the task as done
-    // Example: Update the sheet, change a value, etc.
-    await interaction.reply(`Marked task ${originalIndex} as done`);
+    if (interaction.customId === "prevPage") {
+      page = Math.max(page - 1, 0);
+      await sendTask(interaction, client, page);
+    }
+    else if (interaction.customId === "nextPage") {
+      page += 1;
+      await sendTask(interaction, client, page);
+    }
+  } catch (error) {
+    console.error('Pagination error:', error);
+    // Only send followUp if we haven't responded yet
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.reply({ content: '❌ Failed to update page.', ephemeral: true });
+    }
   }
 };
