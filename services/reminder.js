@@ -57,7 +57,7 @@ async function sendTask(interaction, client) {
       type: 2,
       label: `${i + 1}`,
       style: 1,
-      custom_id: `markDone-${originalIndex}`,
+      custom_id: `markDone-${originalIndex}-${i + 1}`,
     }));
 
 
