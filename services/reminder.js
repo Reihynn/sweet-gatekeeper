@@ -49,9 +49,9 @@ async function sendTask(interaction, client, page = 0) {
 
     const buttons = limitedRows.map((row, i) => ({
       type: 2,
-      label: `${i + 1}`,
+      label: `${startIndex + i + 1}`,
       style: 1,
-      custom_id: `markDone-${row.originalIndex}-${i + 1}`, // Use originalIndex to track tasks
+      custom_id: `markDone-${row.originalIndex}-${startIndex + i + 1}`,
     }));
 
     // Create action rows for buttons (grouped in rows of 5)
