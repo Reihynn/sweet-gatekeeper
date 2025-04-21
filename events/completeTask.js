@@ -35,7 +35,7 @@ module.exports = {
         });
 
         await interaction.reply({
-          content: `✅ Task ${displayNumber} marked as done!`,
+          content: `✅ Task ${index + 1} marked as done!`,
           ephemeral: true,
         });
       } catch (err) {
