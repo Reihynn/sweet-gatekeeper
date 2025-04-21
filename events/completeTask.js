@@ -1,5 +1,6 @@
 
 const { google } = require("googleapis");
+const { sendTask } = require('../services/reminder');
 
 const auth = new google.auth.GoogleAuth({
   keyFile: "credentials.json",
@@ -58,11 +59,11 @@ module.exports = {
           },
         });
 
-        // Update the task list after marking as done
-        await sendTask(interaction, interaction.client);
-        
-        // Use deferred reply instead of a new reply
+        // First defer the update
         await interaction.deferUpdate();
+        
+        // Then update the task list
+        await sendTask(interaction, interaction.client);
       } catch (err) {
         console.error("Failed to mark task done:", err);
         await interaction.reply({
