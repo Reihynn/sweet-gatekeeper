@@ -18,7 +18,15 @@ module.exports = {
     if (customId.startsWith("markDone-")) {
       const parts = interaction.customId.split("-");
       const index = parseInt(parts[1]);
-      const displayNumber = parts[2];
+      const displayNumber = parseInt(parts[2]);
+
+      if (isNaN(index) || isNaN(displayNumber)) {
+        await interaction.reply({
+          content: "⚠️ Invalid task number.",
+          ephemeral: true,
+        });
+        return;
+      }
 
       const spreadsheetId = process.env.SHEET_ID;
       const range = "Reminders!F6:F"; // Column F (marked as done)
