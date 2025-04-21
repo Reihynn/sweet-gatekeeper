@@ -7,6 +7,9 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
 
+const interactionCreateHandler = require('./events/completeTask');
+client.on('interactionCreate', interactionCreateHandler.execute);
+
 client.commands = new Collection();
 
 // Load all commands from /slashes
