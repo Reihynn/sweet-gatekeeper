@@ -5,6 +5,9 @@ const auth = new google.auth.GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
+const parts = interaction.customId.split("-");
+const displayNumber = parts[2];
+
 const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = {
@@ -32,7 +35,7 @@ module.exports = {
         });
 
         await interaction.reply({
-          content: `✅ Task ${index + 1} marked as done!`,
+          content: `✅ Task ${displayNumber} marked as done!`,
           ephemeral: true,
         });
       } catch (err) {
