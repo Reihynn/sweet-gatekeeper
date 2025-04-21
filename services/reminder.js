@@ -53,11 +53,11 @@ async function sendTask(interaction, client) {
       return `**${i + 1}. ${row.task}**📅 <t:${unix}:R> (<t:${unix}:F>)\n-# - ${row.desc}`;
     }).join("\n");
 
-    const buttons = sortedRows.map(({ originalIndex }, i) => ({
+    const buttons = sortedRows.map((row, i) => ({
       type: 2,
       label: `${i + 1}`,
       style: 1,
-      custom_id: `markDone-${originalIndex}-${i + 1}`,
+      custom_id: `markDone-${row.originalIndex}-${i + 1}`,
     }));
 
 
