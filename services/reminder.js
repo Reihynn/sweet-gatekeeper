@@ -47,12 +47,14 @@ async function sendTask(interaction, client) {
 }
 
 async function addTask(task, description, date) {
+  const spreadsheetId = "1Lad6LgQVZQOuOARJRYR3R7l6uPwlROkdUWeuTbydiI0";
+  const range = "Reminders!C6:F";
   const values = [[task, description, date]];
   const resource = { values };
 
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: "1Lad6LgQVZQOuOARJRYR3R7l6uPwlROkdUWeuTbydiI0",
-    range: "Reminders!C6:F",
+  return await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range,
     valueInputOption: 'USER_ENTERED',
     resource,
   });
