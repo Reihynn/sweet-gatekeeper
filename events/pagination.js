@@ -1,4 +1,3 @@
-
 const { sendTask } = require('../services/reminder');
 
 module.exports = async (client, interaction) => {
@@ -7,8 +6,8 @@ module.exports = async (client, interaction) => {
   try {
     // Defer the button interaction immediately
     await interaction.deferUpdate();
-    
-    let page = 0;
+
+    let page = parseInt(interaction.customId.split('-')[1]) || 0;
 
     if (interaction.customId === "prevPage") {
       page = Math.max(page - 1, 0);
@@ -18,9 +17,15 @@ module.exports = async (client, interaction) => {
       page += 1;
       await sendTask(interaction, client, page);
     }
+    else if (interaction.customId === "toggleEphemeralOff") {
+      // Handle the Show Everyone button
+      await interaction.update({
+        content: "Task completion will now be visible to everyone in the channel!",
+        ephemeral: false,  // Make the content visible to everyone
+      });
+    }
   } catch (error) {
     console.error('Pagination error:', error);
-    // Only send followUp if we haven't responded yet
     if (!interaction.replied && !interaction.deferred) {
       await interaction.reply({ content: '❌ Failed to update page.', ephemeral: true });
     }
